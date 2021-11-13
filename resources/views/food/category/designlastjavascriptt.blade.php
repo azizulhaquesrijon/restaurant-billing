@@ -366,7 +366,6 @@
           <center>
         </div>
         <div class="col-sm-12 table2 ">
-          <form id="table2Form">
 
           <table style="width:100%" class="" id="table2">
             <thead>
@@ -380,17 +379,11 @@
             </tr>
           </thead>
             <tbody class="tbody1 tboady" id="tboady1">
-              <td><input id="t11" name="t11" value="adsd"><td>
-                <td><input value="adsd"><td>
-                  <td><input value="adsd"><td>
-                    <td><input value="adsd"><td>
-                      <td><input value="adsd"><td>
 
 
 
            </tboady>
           </table>
-        </form>
         </div>
 
       </div>
@@ -438,7 +431,6 @@
             </div>
           </div>
           <div class="col-sm-6 secondDiv32">
-
             <div class="row" style="padding:3px;">
             <div class="col-sm-6 bill-label" style="color:red;">
 
@@ -497,7 +489,7 @@
           <button type="button" class="btn btn-primary button-width button-height ">Primary</button>
         </div>
         <div class="col-sm-6">
-          <button type="button" class="btn btn-success button-width button-height " id="paymentId">Primary</button>
+          <button type="button" class="btn btn-success button-width button-height " onclick="submit()">Primary</button>
         </div>
       </div>    </div>
   </div>
@@ -583,19 +575,70 @@ function closeAllSelect(elmnt) {
 /*if the user clicks anywhere outside the select box,
 then close all select boxes:*/
 document.addEventListener("click", closeAllSelect);
-var i=0;
+
+//////////////////////////
+//////////////////////////
+
+function barcodeSearch12(){
+
+  var pCode=$("#itemCode").val();
+
+  if(pCode!=""){
+
+
+  var url = "{{Route('fetch_item','pCode')}}";
+  url = url.replace('pCode', pCode);
+
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById('1a').innerHTML=url;
+
+        var a=this.responseText.split(/[\:,]+/);
+        document.getElementsById('1').innerHTML=a;
+
+      //if(a!="[]"){
+      //  addRow1(a[1],a[3],a[15],a[9],a[11],a[11]);
+       //}
+     }
+   };
+   xmlhttp.open("GET", url, true);
+   xmlhttp.send();
+ }
+
+}
+
+function barcodeSearch1(){
+
+}
+function barcodeSearch12(){
+  var pCode=$("#itemCode").val();
+  if(pCode!=""){
+    var url = "{{Route('fetch_item','pCode')}}";
+    url = url.replace('pCode', pCode);
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var data = this.responseText;
+        var obj = JSON.parse(data);
+        if(data!="{}"){
+          addItemToList(obj);
+          $("#quantity").val(1);
+          $("#rate").val(obj.price);
+        }
+      }
+    };
+    xmlhttp.open("GET",url, true);
+    xmlhttp.send();
+  }
+}
+
 $("#itemCode").keyup(function(event) {
     if (event.keyCode === 13) {
       var pCode=$("#itemCode").val();
       if(pCode!=""){
         var url = "{{Route('fetch_item','pCode')}}";
         url = url.replace('pCode', pCode);
-
-        var name=[];
-        var price=[];
-        var quantity=[];
-        var id=[];
-
       $.ajax({    //create an ajax request to display.php
             type: "GET",
             url: url,
@@ -603,144 +646,102 @@ $("#itemCode").keyup(function(event) {
             success: function(response){
               var data = response;
               var obj = JSON.parse(data);
-              if(data!="{}"){
-                var new_row = '<tr class="tr1"><td class="fname"><input class="button-width" name="name['+i+']" id="fdname" value="' + obj .foodname+ '" readonly></td><td class="fprice"><input type="number" class="button-width" name="'+price[i]+'" value="' + obj .price + '"></td><td class="fquantity"><input type="number" class="button-width" name="'+quantity[i]+'" value="1"</td><td class="ftotal"><input class="button-width" value="' + obj.price + '" readonly></td><td class="fprice"><input type="hidden" class="button-width" name="'+id[i]+'" value="' + obj .id+ '" readonly><button class="btn btn-danger" onclick="deleteRow(this)"><i class = "fa fa-close"></i></button></td></tr>';
+              alert(response);
 
-                  //var new_row = '<tr class="tr1"><td class="fname">' + obj .foodname+ '</td><td class="fprice">' + obj .price + '</td><td class="fquantity">' + "1" + '</td><td class="ftotal">' + obj.price + '</td><td class="fprice"><button class="btn btn-danger" onclick="deleteRow(this)"><i class = "fa fa-close"></i></button></td></tr>';
+              if(data!="{}"){
+                  var new_row = '<tr class="tr1"><td class="fname">' + obj .foodname+ '</td><td class="fprice">' + obj .price + '</td><td class="fquantity">' + "1" + '</td><td class="ftotal">' + obj.price + '</td><td class="fprice"><button class="btn btn-danger" onclick="deleteRow(this)"><i class = "fa fa-close"></i></button></td></tr>';
                   $("#tboady1").append(new_row);
                   $("#quantity").val(1);
                   $("#rate").val(obj.price);
-                  i++;
               }
             }
         });
       }
+      /////////////////////
+
     }
 });
+
+//addItemToList();
+function addItemToList(item){
+
+  var table = document.getElementById('table2');
+  var rowCnt = table.rows.length;
+  var tr = table.insertRow(rowCnt);
+  tr.setAttribute('class', 'tr1');
+  for (var c = 0; c < 5; c++) {
+    var td = document.createElement('td');
+        // TABLE DEFINITION.
+    td = tr.insertCell(c);
+    if (c == 0) {
+      var fName = document.createElement('span');
+      fName.innerHTML=item.foodname;
+      td.appendChild(fName);
+      //$("#1a").html("p");
+    }else if (c == 1) {
+      var fPrice = document.createElement('span');
+      fPrice.innerHTML=item.price;
+      td.appendChild(fPrice);
+    }else if (c == 2) {
+      var quantity = document.createElement('span');
+      quantity.innerHTML=1;
+      td.appendChild(quantity);
+    }else if(c==3){
+      var total = document.createElement('span');
+      total.innerHTML=item.price;
+      td.appendChild(total);
+    }else{
+      var remove = document.createElement('button');
+      remove.setAttribute('class', 'btn btn-danger');
+      //remove.setAttribute('id', 'removeButton');
+      remove.setAttribute('onclick','deleteRow(this)');
+
+      remove.innerHTML = '<i class = "fa fa-close"></i>';
+      td.appendChild(remove);
+    }
+  }
+
+}
+
+
+$("#removeButton").on('click', function () {
+    $(this).closest('tr').remove();
+});
+
 
 /*---------------DELETE CART ROW------------------------*/
 function deleteRow(btn) {
   var row = btn.parentNode.parentNode;
   row.parentNode.removeChild(row);
 }
-  var data = [];
+
 function submit() {
-  var list=[];
-
-  var fruits = [];
-
-  var val = {};
-  var item=[];
-
-  var name, price, quantity,total;
- $("#tboady1").each(function(index) {
-   name = $(this).find('.fname').text();
-   price = $(this).find('.fprice').text();
-   quantity = $(this).find('.fquantity').text();
-   total = $(this).find('.ftotal').text();
-   //alert(price)
-
-  // ---->Form validation goes here
-   item.push=name;
-
-  //  item.name=name;
-  //  item.price=price;
-  //  item.quantity=quantity;
-  //  item.total=total;
-  //  list.push(item);
-  // forEach((list) => {
-  //
-  // });
-  fruits.push(name);
-  fruits.push(price);
-  fruits.push(quantity);
-  fruits.push(total);
-
-   val.name = name;
-   val.price = price;
-   val.quantity = quantity;
-   val.total = total;
-   data.push(val);
-});
-
-
-//submitFormData(data);
-//submitFormData("po");
-$("#1a").html(fruits[0]);
-
-}
-
-
-function submit12() {
-  var list = {};
-
-  $("#tboady1").each(function(index) {
-    name = $(this).find('.fname').text();
-    price = $(this).find('.fprice').text();
-    quantity = $(this).find('.fquantity').text();
-    total = $(this).find('.ftotal').text();
-    //alert(price);
-
-        list.push(name);
-
- });
-
- alert(list);
-
-}
-//////////////////////////////
-
-function submitFormData(formData) {
-  var url = "{{route('submit_item')}}";
-
-
-  $.ajax({    //create an ajax request to display.php
-        type: "POST",
-        url: url,
-        data:{
-          form_data:formData,
-        },  //expect html to be returned
-        success: function(response){
-        alert('ok');
-        console.log(response);
-    }
+  //Store HTML Table Values into Multidimensional Javascript Array Object
+  var TableData = new Array();
+  $('#table2 tr').each(function(row, tr) {
+    TableData[row] = {
+      "sample1": $(tr).find('td:eq(0)').text(),
+      "sample2": $(tr).find('td:eq(1)').text(),
+      "sample3": $(tr).find('td:eq(2)').text()
+    }//tableData[row]
   });
+
+  TableData.shift(); // first row will be empty - so remove
+  alert(TableData);
+
+// var customers = new Array();
+//            $("#table2 TBODY TR").each(function () {
+//                var row = $(this);
+//                var customer = {};
+//                customer.Name = row.find("TD").eq(0).html();
+//                customer.Country = row.find("TD").eq(1).html();
+//                customers.push(customer);
+//                alert(customers[0]['Country']);
+//
+//            });
+
+
 }
-
-
-/////////////////////////////////////////
-
-
-/*------------------------ADD NEW CUSTOMER---------------------------*/
-
-  $('#paymentId').on('click',(function(e) {
-  //  alert($("#t11").val());
-
-    $('#table2Form').submit();
-
-  }));
-
-
-  $('#table2Form').on('submit',(function(e) {
-
-  e.preventDefault();
-  var formData = new FormData(this);
-  $.ajax({
-   type:'POST',
-   url: '{{ url("submit_item")}}',
-   data:formData,
-   cache:false,
-   contentType: false,
-   processData: false,
-   success:function(data){
-     alert(data);
-
-    },
-    error: function(data){
-      alert("NOT OKK");
-       }
-     });
-    }));
 </script>
 
 </body>

@@ -100,4 +100,16 @@ class FoodController extends Controller
       return Response()->json($item);
 
     }
+    public function submit_item(Request $request){
+      // if ($request->ajax()) {
+      //   dd($request);
+      // }
+      // return $request->name[0];
+      $cat=new Category();
+      $cat->categoryname=$request->name[0];
+      $cat->save();
+
+      // return Response()->json($data);
+
+    }
 }

@@ -114,5 +114,6 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/fetch_item/{code}', 'FoodController@fetch_item')->name('fetch_item');
 
+    Route::post('/submit_item', 'FoodController@submit_item')->name('submit_item');
 
 });
